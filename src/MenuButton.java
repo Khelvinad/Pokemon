@@ -41,4 +41,38 @@ abstract class MenuButtonAction {
             e.printStackTrace();
         }
     }
+
+    public JLabel createChatBoxLabel(String message,float sizeFont, int width, int height, int paddingX, int paddingY) {
+        String imagePath = "src/Asset/chatbox.png";
+        ImageIcon icon = new ImageIcon(imagePath);
+        Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        JLabel label = new JLabel(new ImageIcon(scaledImage));
+        label.setLayout(null);
+        label.setSize(width, height);
+        label.setOpaque(false);
+
+        JTextArea textArea = new JTextArea(message);
+        textArea.setBackground(Color.WHITE);
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(true);
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setOpaque(true);
+        textArea.setBackground(Color.WHITE);
+        textArea.setFont(customFont.deriveFont(Font.PLAIN, sizeFont));
+
+        int textWidth = width - 2 * paddingX;
+        int textHeight = height - 2 * paddingY;
+
+        int textX = (width - textWidth) / 2;  
+        int textY = (height - textHeight) / 2;
+        textArea.setBounds(textX, textY, textWidth, textHeight);
+
+        label.add(textArea);
+
+        return label;
+    }
+
+
+
 }
