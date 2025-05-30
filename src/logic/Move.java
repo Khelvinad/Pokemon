@@ -1,3 +1,5 @@
+package logic;
+
 public class Move {
     private String name;
     private Type type;

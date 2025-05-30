@@ -1,7 +1,13 @@
+package logic;
+
+import java.util.Random;
+
 // Battle.java
 public class Battle {
     private Pokemon pokemon1;
     private Pokemon pokemon2;
+    private Random random = new Random();
+
 
     public Battle(Pokemon pokemon1, Pokemon pokemon2) {
         this.pokemon1 = pokemon1;
@@ -12,10 +18,7 @@ public class Battle {
         System.out.println("A battle begins between " + pokemon1.getName() + " and " + pokemon2.getName() + "!");
 
         while (!pokemon1.isFainted() && !pokemon2.isFainted()) {
-            turn(pokemon1, pokemon2); // Pokemon 1's turn
-            if (pokemon2.isFainted()) break; // Check if Pokemon 2 fainted
-            turn(pokemon2, pokemon1); // Pokemon 2's turn
-            if (pokemon1.isFainted()) break; // Check if Pokemon 1 fainted
+            
         }
 
         if (pokemon1.isFainted()) {
@@ -27,9 +30,19 @@ public class Battle {
 
     private void turn(Pokemon attacker, Pokemon defender) {
         // (Simplified) Choose a move (you might want to let the user choose)
+        attacker.updateBuffs();
+        defender.updateBuffs();
         Move chosenMove = attacker.getMoves().get(0); // For now, just the first move
 
         attacker.attack(defender, chosenMove);
+    }
+
+    private void botTurn(Pokemon bot, Pokemon player) {
+        bot.updateBuffs();
+        player.updateBuffs();
+
+        Move chosenMove = bot.getMoves().get(random.nextInt(bot.getMoves().size()));
+        bot.attack(player, chosenMove);
     }
 
     public static int calculateDamage(Pokemon attacker, Move move, Pokemon defender) {

@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
-   
+
     final int originalTileSize = 19;
     final int scale = 2;
 
