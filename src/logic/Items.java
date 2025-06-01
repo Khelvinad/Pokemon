@@ -11,6 +11,6 @@ public abstract class Items {
         return name;
     }
 
-    public abstract void applyEffect(Pokemon target);
+    public abstract String applyEffect(Pokemon target);
 
 }

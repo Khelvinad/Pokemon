@@ -26,7 +26,6 @@ public class Pokemon {
         this.maxHealth = health;
     }
 
-    // ***Getters and Setters (Crucial!)***
     public String getName() {
         return name;
     }
@@ -48,7 +47,7 @@ public class Pokemon {
     }
 
     public int getAttack() {
-        return attack;
+        return attack + attackBoost;
     }
 
     public int getDefense() {
@@ -77,17 +76,22 @@ public class Pokemon {
         moves.add(move);
     }
 
-    public void attack(Pokemon target, Move move) {
-        int damage = Battle.calculateDamage(this, move, target);
-        target.takeDamage(damage);
-        System.out.println(this.name + " used " + move.getName() + " on " + target.getName() + " for " + damage + " damage!");
+    public String attack(Pokemon target, Move move) {
+        int damage = Battle.calculateDamage(this, move, target); //
+        String attackMessage = this.name + " used " + move.getName() + " on " + target.getName() + " for " + damage + " damage!";
+        String faintMessage = target.takeDamage(damage); //
+        return attackMessage + (faintMessage.isEmpty() ? "" : "\n" + faintMessage);
     }
 
-    public void takeDamage(int damage) {
+    public String takeDamage(int damage) {
         this.health -= damage;
-        if (this.health <= 0) {
-            System.out.println(this.name + " fainted!");
+        if (this.health < 0) {
+            this.health = 0;
         }
+        if (this.health <= 0) {
+            return this.name + " fainted!";
+        }
+        return ""; 
     }
 
     public boolean isFainted() {
@@ -109,5 +113,4 @@ public class Pokemon {
             }
         }
     }
-
 }

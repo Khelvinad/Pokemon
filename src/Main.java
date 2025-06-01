@@ -1,8 +1,6 @@
 import ingamebattle.battlePane;
 import javax.swing.JFrame;
-import logic.Move;
-import logic.Pokemon;
-import logic.Type;
+import logic.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -22,8 +20,11 @@ public class Main {
         playerPokemon.addMove(new Move("Water Gun", Type.WATER, 30));
         enemyPokemon.addMove(new Move("Ember", Type.FIRE, 30));
         enemyPokemon.addMove(new Move("Scratch", Type.NORMAL, 15));
+        Inventory playerInventory = new Inventory();
+        playerInventory.addItem(new Potion(50), 3);
+        playerInventory.addItem(new AttackBoost(10, 3), 1);
 
-        battlePane battle = new battlePane(playerPokemon, enemyPokemon);
+        battlePane battle = new battlePane(playerPokemon, enemyPokemon, playerInventory);
         frame.add(battle.getPanel());
         frame.setVisible(true);
 

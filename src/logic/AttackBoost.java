@@ -11,8 +11,8 @@ public class AttackBoost extends Items {
     }
 
     @Override
-    public void applyEffect(Pokemon target) {
+    public String applyEffect(Pokemon target) {
         target.boostAttack(boostAmount, duration);
+        return target.getName() + "'s Attack rose by " + boostAmount + " for " + duration + " turns!";
     }
 }
-
