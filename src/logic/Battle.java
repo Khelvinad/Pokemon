@@ -30,7 +30,7 @@ public class Battle {
         if (pokemon2.getMoves().isEmpty()) {
             return pokemon2.getName() + " has no moves!";
         }
-        Move enemyMove = pokemon2.getMoves().get(random.nextInt(pokemon2.getMoves().size())); //
+        Move enemyMove = pokemon2.getMoves().get(random.nextInt(pokemon2.getMoves().size()));
         return pokemon2.attack(pokemon1, enemyMove);
     }
 
@@ -47,11 +47,9 @@ public class Battle {
         return "The battle continues.";
     }
 
-
-    public void start() { //
+    public void start() {
         System.out.println("A battle begins between " + pokemon1.getName() + " and " + pokemon2.getName() + "!");
     }
-
 
     public static int calculateDamage(Pokemon attacker, Move move, Pokemon defender) {
         int attackerAttack = attacker.getAttack();
@@ -60,31 +58,34 @@ public class Battle {
         if (defenderDefense == 0) defenderDefense = 1;
 
         int damage = (int) ((move.getPower() * attackerAttack / defenderDefense) * effectiveness);
-        return Math.max(0, damage); //
+        return Math.max(0, damage);
     }
 
-    private static double[][] typeChart = { //
-            //                      FIRE   WATER  GRASS  NORMAL ELECTRIC
-            /* FIRE */         {  1.0,   0.5,   2.0,   1.0,   1.0  }, //
-            /* WATER */        {  0.5,   1.0,   0.5,   1.0,   2.0  }, // Modifikasi agar sesuai dengan type effectiveness umum (Water vs Electric)
-            /* GRASS */        {  2.0,   0.5,   1.0,   1.0,   0.5  }, // Modifikasi (Grass vs Electric)
-            /* NORMAL */       {  1.0,   1.0,   1.0,   1.0,   1.0  }, //
-            /* ELECTRIC */     {  1.0,   1.0,   1.0,   1.0,   0.5  }  // Modifikasi (Electric vs Electric = 0.5)
-            // FIRE vs WATER = 0.5, FIRE vs GRASS = 2.0
-            // WATER vs FIRE = 2.0, WATER vs GRASS = 0.5, WATER vs ELECTRIC = 2.0 (Electric is strong against Water)
-            // GRASS vs FIRE = 0.5, GRASS vs WATER = 2.0, GRASS vs ELECTRIC = 0.5
-            // ELECTRIC vs WATER = 2.0, ELECTRIC vs GRASS = 0.5, ELECTRIC vs ELECTRIC = 0.5
+    private static double[][] typeChart = {
+        // ATTACKER ↓ | DEFENDER →   FI    WA    GR    NO    EL    PO    GD    PS    DA    RO    GH
+        /* FIRE */    {  1.0, 0.5,  2.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,  1.0  },
+        /* WATER */   {  2.0, 0.5,  0.5,  1.0,  1.0,  1.0,  2.0,  1.0,  1.0,  2.0,  1.0  },
+        /* GRASS */   {  0.5, 2.0,  0.5,  1.0,  1.0,  0.5,  2.0,  1.0,  1.0,  2.0,  1.0  },
+        /* NORMAL */  {  1.0, 1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5,  0.0  },
+        /* ELECTRIC */{  1.0, 2.0,  0.5,  1.0,  0.5,  1.0,  0.0,  1.0,  1.0,  1.0,  1.0  },
+        /* POISON */  {  1.0, 1.0,  2.0,  1.0,  1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5  },
+        /* GROUND */  {  2.0, 1.0,  0.5,  1.0,  2.0,  2.0,  1.0,  1.0,  1.0,  2.0,  1.0  },
+        /* PSYCHIC */ {  1.0, 1.0,  1.0,  1.0,  1.0,  2.0,  1.0,  0.5,  0.0,  1.0,  1.0  },
+        /* DARK */    {  1.0, 1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  2.0,  0.5,  1.0,  0.5  },
+        /* ROCK */    {  2.0, 1.0,  1.0,  1.0,  1.0,  1.0,  0.5,  1.0,  1.0,  1.0,  1.0  },
+        /* GHOST */   {  1.0, 1.0,  1.0,  0.0,  1.0,  1.0,  1.0,  2.0,  0.5,  1.0,  2.0  }
     };
 
     private static double getTypeEffectiveness(Type attackType, Type defendType) {
-        int attackIndex = attackType.ordinal(); //
-        int defendIndex = defendType.ordinal(); //
+        int attackIndex = attackType.ordinal();
+        int defendIndex = defendType.ordinal();
 
-        if (attackIndex < typeChart.length && defendIndex < typeChart[attackIndex].length) { //
-            return typeChart[attackIndex][defendIndex]; //
+        if (attackIndex >= 0 && attackIndex < typeChart.length &&
+            defendIndex >= 0 && defendIndex < typeChart[attackIndex].length) {
+            return typeChart[attackIndex][defendIndex];
         } else {
-            System.out.println("Type effectiveness data not found for " + attackType + " attacking " + defendType + ". Returning 1.0 (normal effectiveness)."); //
-            return 1.0; //
+            System.out.println("Type effectiveness data not found for " + attackType + " attacking " + defendType + ". Ordinals: " + attackIndex + ", " + defendIndex + ". Returning 1.0 (normal effectiveness).");
+            return 1.0;
         }
     }
 }

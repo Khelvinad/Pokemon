@@ -59,7 +59,7 @@ public class battlePane {
         if (typingTimer != null && typingTimer.isRunning()) {
             typingTimer.stop();
         }
-        chatBox.textArea.setText("");
+        chatBox.getTextArea().setText("");
         charIndex = 0;
         int delay = 5;
 
@@ -67,7 +67,7 @@ public class battlePane {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (charIndex < fullText.length()) {
-                    chatBox.textArea.setText(chatBox.textArea.getText() + fullText.charAt(charIndex));
+                    chatBox.getTextArea().setText(chatBox.getTextArea().getText() + fullText.charAt(charIndex));
                     charIndex++;
                 } else {
                     ((Timer) e.getSource()).stop();
@@ -139,7 +139,7 @@ public class battlePane {
         chatPanel.setPreferredSize(new Dimension(880, 180));
 
         chatBox = ChatBox.createChatBox("src/Asset/textBox.png", "", 20, 880, 175, 30, 30);
-        chatPanel.add(chatBox.label, BorderLayout.WEST);
+        chatPanel.add(chatBox.getLabel(), BorderLayout.WEST);
         bottomPanel.add(chatPanel, BorderLayout.WEST);
 
         movePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -268,8 +268,8 @@ public class battlePane {
 
         chatPanel.revalidate();
         chatPanel.repaint();
-        chatBox.label.revalidate();
-        chatBox.label.repaint();
+        chatBox.getLabel().revalidate();
+        chatBox.getLabel().repaint();
 
         panel.revalidate();
         panel.repaint();
@@ -287,8 +287,8 @@ public class battlePane {
 
         chatPanel.revalidate();
         chatPanel.repaint();
-        chatBox.label.revalidate();
-        chatBox.label.repaint();
+        chatBox.getLabel().revalidate();
+        chatBox.getLabel().repaint();
 
         panel.revalidate();
         panel.repaint();
