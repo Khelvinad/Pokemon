@@ -74,29 +74,41 @@ public class Frame {
 
         JButton startButton = new JButton("Start");
         startButton.setFont(customFont.deriveFont(Font.BOLD, 18f));
-        startButton.setBackground(Color.WHITE);
+        startButton.setBackground(new Color(233, 247, 255));
         startButton.setForeground(Color.BLACK);
         startButton.setFocusPainted(false);
         startButton.setPreferredSize(buttonSize);
         startButton.setMaximumSize(buttonSize);
         startButton.setMinimumSize(buttonSize);
+        startButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(143, 248, 226), 4),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         JButton loadButton = new JButton("Load");
         loadButton.setFont(customFont.deriveFont(Font.BOLD, 18f));
-        loadButton.setBackground(Color.WHITE);
+        loadButton.setBackground(new Color(233, 247, 255));
         loadButton.setForeground(Color.BLACK);
         loadButton.setFocusPainted(false);
         loadButton.setPreferredSize(buttonSize);
         loadButton.setMaximumSize(buttonSize);
         loadButton.setMinimumSize(buttonSize);
+        loadButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(249, 224, 144), 4),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         JButton exitButton = new JButton("Exit");
         exitButton.setFont(customFont.deriveFont(Font.BOLD, 18f));
-        exitButton.setBackground(Color.WHITE);
+        exitButton.setBackground(new Color(233, 247, 255));
         exitButton.setForeground(Color.BLACK);
-        exitButton.setPreferredSize(buttonSize);
+        exitButton.setPreferredSize(new Dimension(200, 30));
         exitButton.setMaximumSize(buttonSize);
         exitButton.setMinimumSize(buttonSize);
+        exitButton.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(255, 73, 73), 4),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         centerPan.add(Box.createRigidArea(new Dimension(0, 240)));
         centerPan.add(startButton);

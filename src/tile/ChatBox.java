@@ -8,6 +8,7 @@ public class ChatBox {
     private JLabel label;
     private JTextArea textArea;
     private JScrollPane scrollPane;
+    
 
     public ChatBox(JLabel label, JTextArea textArea, JScrollPane scrollPane) {
         this.label = label;
