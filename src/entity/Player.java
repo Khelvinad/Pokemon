@@ -106,6 +106,7 @@ public class Player extends Entity{
 
     public void update() {
         if (keyH == null || gp == null) return; 
+        if (gp.gameState != GamePanel.GameState.PLAYING) return;
 
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.upPressed) {
@@ -127,6 +128,19 @@ public class Player extends Entity{
                     case "down": worldY += speed; break;
                     case "left": worldX -= speed; break;
                     case "right": worldX += speed; break;
+                }
+            }
+            int solidAreaCenterX = worldX + solidArea.x + solidArea.width / 2;
+            int solidAreaCenterY = worldY + solidArea.y + solidArea.height / 2;
+            int playerCol = solidAreaCenterX / gp.tileSize;
+            int playerRow = solidAreaCenterY / gp.tileSize;
+
+            if (playerCol >= 0 && playerCol < gp.maxWorldCol && playerRow >= 0 && playerRow < gp.maxWorldRow) {
+                int tileNum = gp.tileM.mapTileNum[playerCol][playerRow];
+                if (tileNum >= 0 && tileNum < gp.tileM.tile.length && gp.tileM.tile[tileNum].isEncounterTile) {
+                    if (Math.random() < 0.20) {
+                        gp.startRandomBattle();
+                    }
                 }
             }
             spriteCounter++;

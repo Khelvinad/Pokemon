@@ -37,6 +37,7 @@ public class TileManager {
 
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getResourceAsStream("/Asset/tiles/semak.png"));
+            tile[2].isEncounterTile = true;
 
             tile[3] = new Tile();
             tile[3].image = ImageIO.read(getClass().getResourceAsStream("/Asset/tiles/pohon.png"));
@@ -51,6 +52,7 @@ public class TileManager {
 
             tile[6] = new Tile();
             tile[6].image = ImageIO.read(getClass().getResourceAsStream("/Asset/tiles/semakp.png"));
+            tile[6].isEncounterTile = true;
 
         } catch(IOException e) {
             e.printStackTrace();
@@ -138,14 +140,9 @@ public class TileManager {
             
             if (worldCol == gp.maxWorldCol) {
                 worldCol = 0;
-              
                 worldRow++;
-               
+            
             }
-            
-           
-            
-            
         }
 
     }

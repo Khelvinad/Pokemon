@@ -1,11 +1,22 @@
 package game;
 
 import entity.Player;
+import game.GamePanel.GameState;
+import ingamebattle.battlePane;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Random;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import logic.DataHandler;
+import logic.Pokedex;
+import logic.Pokemon;
 import tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -22,10 +33,14 @@ public class GamePanel extends JPanel implements Runnable {
     public final int maxWorldRow = 32;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize* maxWorldRow;
+
+    public enum GameState{PLAYING, IN_BATTLE, PAUSED};
+    public GameState gameState = GameState.PLAYING;
+    private Random random = new Random();
     
     //FPS
     int FPS = 60;
-    TileManager tileM = new TileManager(this);
+    public TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
     public SolidCheck solidCheck = new SolidCheck(this);
@@ -66,10 +81,10 @@ public class GamePanel extends JPanel implements Runnable {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void update() {
+        if (gameState != GameState.PLAYING) return;
         player.update();
     }
 
@@ -80,4 +95,80 @@ public class GamePanel extends JPanel implements Runnable {
         player.draw(g2);
         g2.dispose();
     }
+
+    public void startRandomBattle() {
+        if (gameState == GameState.IN_BATTLE) return;
+
+        gameState = GameState.IN_BATTLE;
+        System.out.println("Starting random battle...");
+
+        List<String> allPokemonNames = Pokedex.getAllPokemonNames();
+        if (allPokemonNames.isEmpty()) {
+            System.err.println("Pokedex is empty!");
+            gameState = GameState.PLAYING;
+            return;
+        }
+        String randomPokemonName = allPokemonNames.get(random.nextInt(allPokemonNames.size()));
+        Pokemon wildPokemon = Pokedex.getPokemonData(randomPokemonName);
+
+        if (wildPokemon == null) {
+            System.err.println("Could not load wild Pokemon: " + randomPokemonName);
+            gameState = GameState.PLAYING;
+            return;
+        }
+        Pokemon playerActivePokemon = player.getActivePokemon();
+        if (playerActivePokemon == null || playerActivePokemon.isFainted()) {
+            playerActivePokemon = player.getPokemonParty().stream()
+                                    .filter(p -> p != null && !p.isFainted())
+                                    .findFirst().orElse(null);
+            if (playerActivePokemon == null) {
+                System.err.println("Player has no healthy Pokemon!");
+                gameState = GameState.PLAYING;
+                return;
+            }
+            player.setActivePokemon(playerActivePokemon);
+        }
+
+        ActionListener afterBattleHandler = event -> {
+            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (topFrame != null) {
+                topFrame.getContentPane().removeAll();
+                topFrame.setContentPane(this);
+                topFrame.pack();
+                topFrame.setLocationRelativeTo(null);
+                topFrame.setVisible(true);
+                this.requestFocusInWindow();
+            }
+            gameState = GameState.PLAYING;
+            String currentMapId = "map01.txt";
+            DataHandler.saveGame(player, currentMapId);
+        };
+        ActionListener runAttemptHandlerForWildBattle = runEvent -> {
+            System.out.println("Player ran from wild Pokemon!");
+            if (afterBattleHandler != null) {
+                afterBattleHandler.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "ran_successfully"));
+            }
+        };
+
+        battlePane battleScreen = new battlePane(
+            playerActivePokemon,
+            wildPokemon,
+            player.getInventory(),
+            runAttemptHandlerForWildBattle,
+            afterBattleHandler
+        );
+
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        if (topFrame != null) {
+            topFrame.getContentPane().removeAll();
+            topFrame.setContentPane(battleScreen.getPanel());
+            topFrame.pack();
+            topFrame.setLocationRelativeTo(null);
+            battleScreen.getPanel().requestFocusInWindow();
+        } else {
+            System.err.println("Could not get top-level frame for battle pane.");
+            gameState = GameState.PLAYING;
+        }
+    }
+
 }
