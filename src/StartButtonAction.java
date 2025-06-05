@@ -246,47 +246,39 @@ class StartButtonAction extends MenuButtonAction {
                 return;
             }
 
-            // This player instance is for data collection
             Inventory startingInventory = new Inventory();
             startingInventory.addPokemon(this.selectedPokemon);
-            // Add any initial items
-            startingInventory.addItem(new Potion(20), 3); // Example
-            startingInventory.addItem(new AttackBoost(5, 1), 2); // Example
+            startingInventory.addItem(new Potion(20), 3); 
+            startingInventory.addItem(new AttackBoost(5, 1), 2); 
 
-            // Correct enemy Pokemon name if it was a typo
             Pokemon enemyPokemon;
             if (this.selectedPokemon.getName().equals("Bulbasaur")) {
                 enemyPokemon = Pokedex.getPokemonData("Squirtle");
             } else if (this.selectedPokemon.getName().equals("Charmander")) {
                 enemyPokemon = Pokedex.getPokemonData("Bulbasaur");
-            } else { // Squirtle
-                enemyPokemon = Pokedex.getPokemonData("Charmander"); // Was "Charmender"
+            } else { 
+                enemyPokemon = Pokedex.getPokemonData("Charmander"); 
             }
 
-            // ActionListener for what happens AFTER the initial battle
             ActionListener afterInitialBattleHandler = event -> {
-                // This is called when the battlePane signals completion (e.g., win, loss, or a specific run)
-                // Now, transition to GamePanel
-                frame.getContentPane().removeAll(); // Clear the battle pane
+                frame.getContentPane().removeAll(); 
 
-                GamePanel gamePanel = new GamePanel(); // GamePanel creates its OWN Player instance
+                GamePanel gamePanel = new GamePanel(); 
 
-                // Configure GamePanel's player with the collected data
                 gamePanel.player.setPlayerName(this.inputPlayerName);
-                gamePanel.player.setInventory(startingInventory); // The inventory with the chosen Pokemon and items
+                gamePanel.player.setInventory(startingInventory); 
                 gamePanel.player.setActivePokemon(this.selectedPokemon);
-                // Player's worldX, worldY are set by its constructor via setDefaultValues using gp.tileSize
-
-                DataHandler.saveGame(gamePanel.player, "map01.txt"); // Save the initial game state
+                
+                DataHandler.saveGame(gamePanel.player, "map01.txt"); 
 
                 frame.add(gamePanel);
-                frame.pack(); // Adjust frame to GamePanel's preferred size
-                frame.setContentPane(gamePanel); // Set gamePanel as the new content
-                frame.setLocationRelativeTo(null); // Re-center frame
+                frame.pack(); 
+                frame.setContentPane(gamePanel); 
+                frame.setLocationRelativeTo(null); 
                 frame.setVisible(true);
 
                 gamePanel.startGameThread();
-                gamePanel.requestFocusInWindow(); // Crucial for keyboard input to GamePanel
+                gamePanel.requestFocusInWindow(); 
 
                 frame.revalidate();
                 frame.repaint();

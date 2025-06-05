@@ -64,4 +64,3 @@ abstract class MenuButtonAction {
         return panel;
     }
 }
-

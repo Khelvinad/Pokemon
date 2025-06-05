@@ -16,47 +16,40 @@ public class Player extends Entity{
 
     GamePanel gp;
     KeyHandler keyH;
-    private String name = "Player"; // Default name
+    private String name = "Player"; 
     private Inventory inventory;
     private Pokemon activePokemon;
 
     public final int screenX;
     public final int screenY;
 
-    // Constructor used by GamePanel
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
         this.screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         this.screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
-        this.solidArea = new Rectangle(8, 16, 32, 32); // Solid area relative to player's top-left
-        this.inventory = new Inventory(); // Each player gets a new inventory
+        this.solidArea = new Rectangle(8, 16, 32, 32); 
+        this.inventory = new Inventory(); 
 
-        setDefaultValues(); // gp is available, so tileSizes will be correct
+        setDefaultValues(); 
         getPlayerImage();
     }
 
-    // Constructor for placeholder or data-holding player, NOT directly for GamePanel game world
-    // This constructor might be less used if StartButtonAction configures GamePanel's player.
     public Player(String name, Inventory inventory, Pokemon activePokemon) {
         this.name = name;
         this.inventory = inventory;
         this.activePokemon = activePokemon;
         
-        this.gp = null; // GamePanel context is not available here
+        this.gp = null; 
         this.keyH = null;
 
-        // screenX and screenY are final. They should ideally be set with GamePanel context.
-        // If this Player instance is NOT the one used in GamePanel, these are just placeholders.
-        this.screenX = 0; // Placeholder
-        this.screenY = 0; // Placeholder
+        this.screenX = 0; 
+        this.screenY = 0; 
         
         this.solidArea = new Rectangle(8, 16, 32, 32);
         
-        // Set default world positions that do not rely on gp.tileSize
-        // These would be overridden if this Player's data is transferred to GamePanel's player.
-        this.worldX = 16 * 38; // Example starting X (tile 16, assuming default 38px tile size)
-        this.worldY = 16 * 38; // Example starting Y
+        this.worldX = 16 * 38; 
+        this.worldY = 16 * 38; 
         this.speed = 4;
         this.direction = "down";
 
@@ -77,12 +70,10 @@ public class Player extends Entity{
     }
 
     public void setDefaultValues() {
-        if (gp != null) { // Use GamePanel context if available
-            worldX = gp.tileSize * 16; // Default starting col
-            worldY = gp.tileSize * 16; // Default starting row
+        if (gp != null) { 
+            worldX = gp.tileSize * 16; 
+            worldY = gp.tileSize * 16; 
         } else {
-            // Fallback if gp is not set (e.g. during initial data-only setup)
-            // Assuming a common tile size if gp is not available (e.g. 19 original * 2 scale = 38)
             worldX = 16 * (19 * 2); 
             worldY = 16 * (19 * 2);
         }
@@ -114,7 +105,7 @@ public class Player extends Entity{
     }
 
     public void update() {
-        if (keyH == null || gp == null) return; // Cannot update without KeyHandler or GamePanel
+        if (keyH == null || gp == null) return; 
 
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.upPressed) {
@@ -147,7 +138,7 @@ public class Player extends Entity{
     }
     
     public void draw(Graphics2D g2) {
-        if (gp == null) return; // Cannot draw without GamePanel context
+        if (gp == null) return; 
 
         BufferedImage image = null;
         switch (direction) {
@@ -157,11 +148,9 @@ public class Player extends Entity{
             case "right": image = (spriteNum == 1) ? right1 : right2; break;
         }
 
-        // Calculate screen position based on world position and camera
         int currentScreenX = screenX;
         int currentScreenY = screenY;
 
-        // If player is near edge of world, camera stops scrolling
         if (worldX < screenX) {
             currentScreenX = worldX;
         }
