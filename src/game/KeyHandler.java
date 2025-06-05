@@ -9,17 +9,15 @@ public class KeyHandler implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
+        // Tidak digunakan
     }
     
     @Override
     public void keyPressed(KeyEvent e) {
-
         int code = e.getKeyCode();
 
         if (code == KeyEvent.VK_W) {
             upPressed = true;
-
         }
         if (code == KeyEvent.VK_S) {
             downPressed = true;
@@ -34,7 +32,6 @@ public class KeyHandler implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
         int code = e.getKeyCode();
 
         if (code == KeyEvent.VK_W) {
@@ -49,5 +46,15 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_D) {
             rightPressed = false;
         }
+    }
+
+    /**
+     * Metode baru untuk me-reset semua status tombol yang ditekan.
+     */
+    public void resetKeyStates() {
+        upPressed = false;
+        downPressed = false;
+        leftPressed = false;
+        rightPressed = false;
     }
 }

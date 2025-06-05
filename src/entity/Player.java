@@ -26,8 +26,8 @@ public class Player extends Entity{
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
-        this.screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
-        this.screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+        this.screenX = gp.screenWidth / 2 - (gp.tileSize / 2); //
+        this.screenY = gp.screenHeight / 2 - (gp.tileSize / 2); //
         this.solidArea = new Rectangle(8, 16, 32, 32); 
         this.inventory = new Inventory(); 
 
@@ -46,12 +46,12 @@ public class Player extends Entity{
         this.screenX = 0; 
         this.screenY = 0; 
         
-        this.solidArea = new Rectangle(8, 16, 32, 32);
+        this.solidArea = new Rectangle(8, 16, 32, 32); //
         
         this.worldX = 16 * 38; 
         this.worldY = 16 * 38; 
-        this.speed = 4;
-        this.direction = "down";
+        this.speed = 4; //
+        this.direction = "down"; //
 
         getPlayerImage();
     }
@@ -66,7 +66,7 @@ public class Player extends Entity{
     public void setActivePokemon(Pokemon activePokemon) {this.activePokemon = activePokemon;}
     
     public List<Pokemon> getPokemonParty() {
-        return this.inventory != null ? this.inventory.getPokemons() : null;
+        return this.inventory != null ? this.inventory.getPokemons() : null; //
     }
 
     public void setDefaultValues() {
@@ -77,100 +77,103 @@ public class Player extends Entity{
             worldX = 16 * (19 * 2); 
             worldY = 16 * (19 * 2);
         }
-        speed = 4;
-        direction = "down";
+        speed = 4; //
+        direction = "down"; //
     }
 
     public void getPlayerImage() {
         try {
-            up1 = loadImage("/Asset/player/up.png");
-            up2 = loadImage("/Asset/player/up1.png");
-            down1 = loadImage("/Asset/player/down.png");
-            down2 = loadImage("/Asset/player/down1.png");
-            left1 = loadImage("/Asset/player/left.png");
-            left2 = loadImage("/Asset/player/left1.png");
-            right1 = loadImage("/Asset/player/right.png");
-            right2 = loadImage("/Asset/player/right1.png");
+            up1 = loadImage("/Asset/player/up.png"); //
+            up2 = loadImage("/Asset/player/up1.png"); //
+            down1 = loadImage("/Asset/player/down.png"); //
+            down2 = loadImage("/Asset/player/down1.png"); //
+            left1 = loadImage("/Asset/player/left.png"); //
+            left2 = loadImage("/Asset/player/left1.png"); //
+            right1 = loadImage("/Asset/player/right.png"); //
+            right2 = loadImage("/Asset/player/right1.png"); //
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private BufferedImage loadImage(String path) throws IOException {
-        InputStream stream = getClass().getResourceAsStream(path);
-        if (stream == null) {
-            throw new IOException("Cannot find resource: " + path);
+        InputStream stream = getClass().getResourceAsStream(path); //
+        if (stream == null) { //
+            throw new IOException("Cannot find resource: " + path); //
         }
-        return ImageIO.read(stream);
+        return ImageIO.read(stream); //
     }
 
-    public void update() {
-        if (keyH == null || gp == null) return; 
+    public boolean update() { // Diubah menjadi public boolean
+        if (keyH == null || gp == null) return false; 
 
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
-            if (keyH.upPressed) {
-                direction = "up";
-            } else if (keyH.downPressed) {
-                direction = "down";
-            } else if (keyH.leftPressed) {
-                direction = "left";
-            } else if (keyH.rightPressed) {
-                direction = "right";
+        boolean playerHasMoved = false; // Tambahkan flag ini
+
+        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) { //
+            if (keyH.upPressed) { //
+                direction = "up"; //
+            } else if (keyH.downPressed) { //
+                direction = "down"; //
+            } else if (keyH.leftPressed) { //
+                direction = "left"; //
+            } else if (keyH.rightPressed) { //
+                direction = "right"; //
             }
 
-            collisionOn = false;
-            gp.solidCheck.checkTile(this);
+            collisionOn = false; //
+            gp.solidCheck.checkTile(this); //
 
-            if (!collisionOn) {
-                switch (direction) {
-                    case "up": worldY -= speed; break;
-                    case "down": worldY += speed; break;
-                    case "left": worldX -= speed; break;
-                    case "right": worldX += speed; break;
+            if (!collisionOn) { //
+                switch (direction) { //
+                    case "up": worldY -= speed; playerHasMoved = true; break; //
+                    case "down": worldY += speed; playerHasMoved = true; break; //
+                    case "left": worldX -= speed; playerHasMoved = true; break; //
+                    case "right": worldX += speed; playerHasMoved = true; break; //
                 }
             }
-            spriteCounter++;
-            if(spriteCounter > 12) {
-                spriteNum = (spriteNum == 1) ? 2 : 1;
-                spriteCounter = 0;
+            spriteCounter++; //
+            if(spriteCounter > 12) { //
+                spriteNum = (spriteNum == 1) ? 2 : 1; //
+                spriteCounter = 0; //
             }
         }
+        return playerHasMoved; // Kembalikan status pergerakan
     }
     
-    public void draw(Graphics2D g2) {
+    public void draw(Graphics2D g2) { //
         if (gp == null) return; 
 
-        BufferedImage image = null;
-        switch (direction) {
-            case "up": image = (spriteNum == 1) ? up1 : up2; break;
-            case "down": image = (spriteNum == 1) ? down1 : down2; break;
-            case "left": image = (spriteNum == 1) ? left1 : left2; break;
-            case "right": image = (spriteNum == 1) ? right1 : right2; break;
+        BufferedImage image = null; //
+        switch (direction) { //
+            case "up": image = (spriteNum == 1) ? up1 : up2; break; //
+            case "down": image = (spriteNum == 1) ? down1 : down2; break; //
+            case "left": image = (spriteNum == 1) ? left1 : left2; break; //
+            case "right": image = (spriteNum == 1) ? right1 : right2; break; //
         }
 
-        int currentScreenX = screenX;
-        int currentScreenY = screenY;
+        int currentScreenX = screenX; //
+        int currentScreenY = screenY; //
 
-        if (worldX < screenX) {
-            currentScreenX = worldX;
+        if (worldX < screenX) { //
+            currentScreenX = worldX; //
         }
-        if (worldY < screenY) {
-            currentScreenY = worldY;
+        if (worldY < screenY) { //
+            currentScreenY = worldY; //
         }
-        int rightOffset = gp.screenWidth - screenX;
-        if (rightOffset > gp.worldWidth - worldX) {
-            currentScreenX = gp.screenWidth - (gp.worldWidth - worldX);
+        int rightOffset = gp.screenWidth - screenX; //
+        if (rightOffset > gp.worldWidth - worldX) { //
+            currentScreenX = gp.screenWidth - (gp.worldWidth - worldX); //
         }
-        int bottomOffset = gp.screenHeight - screenY;
-        if (bottomOffset > gp.worldHeight - worldY) {
-            currentScreenY = gp.screenHeight - (gp.worldHeight - worldY);
+        int bottomOffset = gp.screenHeight - screenY; //
+        if (bottomOffset > gp.worldHeight - worldY) { //
+            currentScreenY = gp.screenHeight - (gp.worldHeight - worldY); //
         }
         
-        if (image != null) {
-            g2.drawImage(image, currentScreenX, currentScreenY, gp.tileSize, gp.tileSize, null);    
+        if (image != null) { //
+            g2.drawImage(image, currentScreenX, currentScreenY, gp.tileSize, gp.tileSize, null);     //
         } else {
-            g2.setColor(Color.RED);
-            g2.fillRect(currentScreenX, currentScreenY, gp.tileSize, gp.tileSize);
+            g2.setColor(Color.RED); //
+            g2.fillRect(currentScreenX, currentScreenY, gp.tileSize, gp.tileSize); //
         }
     }
 }
