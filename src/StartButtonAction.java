@@ -271,7 +271,7 @@ class StartButtonAction extends MenuButtonAction {
                 
                 DataHandler.saveGame(gamePanel.player, "map01.txt"); 
 
-                frame.add(gamePanel);
+                frame.add(gamePanel, BorderLayout.CENTER);
                 frame.pack(); 
                 frame.setContentPane(gamePanel); 
                 frame.setLocationRelativeTo(null); 
@@ -297,9 +297,8 @@ class StartButtonAction extends MenuButtonAction {
                 afterInitialBattleHandler          
             );
             frame.getContentPane().removeAll(); 
-            frame.setContentPane(battleScreen.getPanel()); 
-            frame.revalidate();
-            frame.repaint();
+            frame.setContentPane(battleScreen.getPanel());
+            frame.pack();
         });
 
         mainPanel.add(chatPanel); 

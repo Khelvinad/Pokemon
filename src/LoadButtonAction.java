@@ -166,6 +166,7 @@ class LoadButtonAction extends MenuButtonAction {
     }
 
     private void loadTheGame() {
+        frame.getContentPane().removeAll();
         Map<String, String> loadedData = DataHandler.loadGameData();
 
         if (loadedData == null) {
@@ -234,15 +235,13 @@ class LoadButtonAction extends MenuButtonAction {
             }
 
             frame.getContentPane().removeAll();
-            frame.add(gamePanel);
-            frame.pack();
+            frame.add(gamePanel, BorderLayout.CENTER);
             frame.setContentPane(gamePanel);
+            frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             gamePanel.startGameThread();
             gamePanel.requestFocusInWindow();
-            frame.revalidate();
-            frame.repaint();
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(frame, "Save data is corrupted (Number format). " + e.getMessage(), "Load Error", JOptionPane.ERROR_MESSAGE);

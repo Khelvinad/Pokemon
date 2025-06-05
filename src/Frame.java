@@ -62,6 +62,7 @@ public class Frame {
         return panel;
     }
     public void startPage() {
+        frame.getContentPane().removeAll();
         JPanel backgroundPanel = createBackgroundPanel("src/Asset/startBG.jpg");
         backgroundPanel.setLayout(null);
 
