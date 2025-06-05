@@ -240,63 +240,74 @@ class StartButtonAction extends MenuButtonAction {
             }
         });
 
-        conButton.addActionListener(e -> { 
-            if (selectedPokemon == null) { 
+        conButton.addActionListener(e -> {
+            if (selectedPokemon == null) {
                 typingEffect(pokemonChatBox.getTextArea(), "Please select a Pokemon first, " + inputPlayerName + "!", 20);
                 return;
             }
 
-            frame.getContentPane().removeAll();
-            Inventory inventory = new Inventory();
-            inventory.addPokemon(selectedPokemon);
-            gamePlayerEntity = new Player(this.inputPlayerName, inventory, this.selectedPokemon);
-            gamePlayerEntity.getInventory().addItem(new Potion(20), 3);
-            gamePlayerEntity.getInventory().addItem(new AttackBoost(5, 1), 2);
-            gamePlayerEntity.setInventory(inventory);
+            // This player instance is for data collection
+            Inventory startingInventory = new Inventory();
+            startingInventory.addPokemon(this.selectedPokemon);
+            // Add any initial items
+            startingInventory.addItem(new Potion(20), 3); // Example
+            startingInventory.addItem(new AttackBoost(5, 1), 2); // Example
 
-
+            // Correct enemy Pokemon name if it was a typo
             Pokemon enemyPokemon;
             if (this.selectedPokemon.getName().equals("Bulbasaur")) {
                 enemyPokemon = Pokedex.getPokemonData("Squirtle");
             } else if (this.selectedPokemon.getName().equals("Charmander")) {
                 enemyPokemon = Pokedex.getPokemonData("Bulbasaur");
-            } else {
-                enemyPokemon = Pokedex.getPokemonData("Charmender");
+            } else { // Squirtle
+                enemyPokemon = Pokedex.getPokemonData("Charmander"); // Was "Charmender"
             }
 
-            ActionListener runHandler = new ActionListener() { 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    showNameInputScreen();
-                }
+            // ActionListener for what happens AFTER the initial battle
+            ActionListener afterInitialBattleHandler = event -> {
+                // This is called when the battlePane signals completion (e.g., win, loss, or a specific run)
+                // Now, transition to GamePanel
+                frame.getContentPane().removeAll(); // Clear the battle pane
+
+                GamePanel gamePanel = new GamePanel(); // GamePanel creates its OWN Player instance
+
+                // Configure GamePanel's player with the collected data
+                gamePanel.player.setPlayerName(this.inputPlayerName);
+                gamePanel.player.setInventory(startingInventory); // The inventory with the chosen Pokemon and items
+                gamePanel.player.setActivePokemon(this.selectedPokemon);
+                // Player's worldX, worldY are set by its constructor via setDefaultValues using gp.tileSize
+
+                DataHandler.saveGame(gamePanel.player, "map01.txt"); // Save the initial game state
+
+                frame.add(gamePanel);
+                frame.pack(); // Adjust frame to GamePanel's preferred size
+                frame.setContentPane(gamePanel); // Set gamePanel as the new content
+                frame.setLocationRelativeTo(null); // Re-center frame
+                frame.setVisible(true);
+
+                gamePanel.startGameThread();
+                gamePanel.requestFocusInWindow(); // Crucial for keyboard input to GamePanel
+
+                frame.revalidate();
+                frame.repaint();
             };
 
-            battlePane battle = new battlePane(this.selectedPokemon, enemyPokemon, inventory, runHandler);
-            // GamePanel gamePanel = new GamePanel();  
-            // gamePlayerEntity = gamePanel.player; 
-            // gamePlayerEntity.setPlayerName(this.inputPlayerName); 
+            ActionListener runAttemptHandlerForInitialBattle = runEvent -> {
+                System.out.println("Run attempted from initial battle. Returning to name input screen.");
+                showNameInputScreen(); 
+            };
 
-            // if (gamePlayerEntity.getInventory().getPokemons() != null) { 
-            //     gamePlayerEntity.getInventory().getPokemons().clear(); 
-            // }
-            // gamePlayerEntity.getInventory().addPokemon(this.selectedPokemon); 
-            // gamePlayerEntity.setActivePokemon(this.selectedPokemon); 
-            // gamePlayerEntity.getInventory().addItem(new Potion(20), 5); 
-
-            // DataHandler.saveGame(gamePlayerEntity, "map01.txt"); 
-            
-            // frame.add(gamePanel); 
-            // frame.pack(); 
-
-            // frame.setContentPane(gamePanel); 
-            // frame.setLocationRelativeTo(null); 
-            // frame.setVisible(true); 
-
-            // gamePanel.startGameThread(); 
-            // gamePanel.requestFocusInWindow(); 
-
-            // frame.revalidate(); 
-            // frame.repaint(); 
+            battlePane battleScreen = new battlePane(
+                this.selectedPokemon, 
+                enemyPokemon, 
+                startingInventory, 
+                runAttemptHandlerForInitialBattle,  
+                afterInitialBattleHandler          
+            );
+            frame.getContentPane().removeAll(); 
+            frame.setContentPane(battleScreen.getPanel()); 
+            frame.revalidate();
+            frame.repaint();
         });
 
         mainPanel.add(chatPanel); 
