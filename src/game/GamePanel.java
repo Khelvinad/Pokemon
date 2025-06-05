@@ -58,7 +58,7 @@ public class GamePanel extends JPanel implements Runnable {
     public String currentMap = "/Asset/map/map01.txt";
 
     // Random Encounter Logic
-    private Random random = new Random();
+    private final Random random = new Random();
     public static final int GRASS_TILE_ID = 2;
     private int delay = 10;
 
