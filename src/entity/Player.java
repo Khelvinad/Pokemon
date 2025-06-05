@@ -25,13 +25,25 @@ public class Player extends Entity{
     public Player(GamePanel gp, KeyHandler keyH) { 
         this.gp = gp;
         this.keyH = keyH;
-        this.inventory = new Inventory();
-
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
         solidArea = new Rectangle(8,16, 32, 32);
         setDefaultValues();
         getPlayerImage();
+    }
+
+    public Player(String name, Inventory inventory, Pokemon activePokemon) {
+        this.name = name;
+        this.inventory = inventory;
+        this.activePokemon = activePokemon;
+        this.gp = null; // GamePanel will be set later
+        this.keyH = null; // KeyHandler will be set later
+        screenX = 0; // Placeholder, will be set in GamePanel
+        screenY = 0; // Placeholder, will be set in GamePanel
+        solidArea = new Rectangle(8,16, 32, 32);
+        setDefaultValues();
+        getPlayerImage();
+
     }
 
     public void setPlayerName(String name) { this.name = name; }

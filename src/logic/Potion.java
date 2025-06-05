@@ -10,15 +10,9 @@ public class Potion extends Items {
 
     @Override
     public String applyEffect(Pokemon target) {
-        System.out.println("[DEBUG Potion.applyEffect] Target: " + target.getName() + 
-                           ", Current HP: " + target.getHealth() + 
-                           ", Max HP: " + target.getMaxHealth() + 
-                           ", Potion Heal Amount: " + this.healAmount);
-
         int oldHP = target.getHealth();
         
         if (oldHP >= target.getMaxHealth()) {
-            System.out.println("[DEBUG Potion.applyEffect] HP is already full or more.");
             return target.getName() + "'s HP is already full."; 
         }
 
@@ -27,15 +21,7 @@ public class Potion extends Items {
             newHP = target.getMaxHealth();
         }
         target.setHealth(newHP);
-        
         int actualHealAmount = newHP - oldHP;
-
-        System.out.println("[DEBUG Potion.applyEffect] Old HP: " + oldHP + 
-                        ", Calculated New HP: " + (oldHP + this.healAmount) + 
-                        ", Capped New HP: " + newHP + 
-                        ", Actual HP After Set: " + target.getHealth() +
-                        ", Amount Healed: " + actualHealAmount);
-        
         if (actualHealAmount > 0) {
             return target.getName() + " recovered " + actualHealAmount + " HP!";
         } else {

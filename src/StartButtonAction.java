@@ -1,5 +1,7 @@
 import entity.Player;
 import game.GamePanel;
+import ingamebattle.battlePane;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +24,7 @@ class StartButtonAction extends MenuButtonAction {
     private Pokemon[] pokemons = new Pokemon[3]; 
     private Pokemon selectedPokemon = null;    
     
-    private entity.Player gamePlayerEntity; 
+    private Player gamePlayerEntity; 
     
     private String inputPlayerName; 
 
@@ -244,32 +246,57 @@ class StartButtonAction extends MenuButtonAction {
                 return;
             }
 
-            frame.getContentPane().removeAll(); 
-            GamePanel gamePanel = new GamePanel();  
-            gamePlayerEntity = gamePanel.player; 
-            gamePlayerEntity.setPlayerName(this.inputPlayerName); 
+            frame.getContentPane().removeAll();
+            Inventory inventory = new Inventory();
+            inventory.addPokemon(selectedPokemon);
+            gamePlayerEntity = new Player(this.inputPlayerName, inventory, this.selectedPokemon);
+            gamePlayerEntity.getInventory().addItem(new Potion(20), 3);
+            gamePlayerEntity.getInventory().addItem(new AttackBoost(5, 1), 2);
+            gamePlayerEntity.setInventory(inventory);
 
-            if (gamePlayerEntity.getInventory().getPokemons() != null) { 
-                gamePlayerEntity.getInventory().getPokemons().clear(); 
+
+            Pokemon enemyPokemon;
+            if (this.selectedPokemon.getName().equals("Bulbasaur")) {
+                enemyPokemon = Pokedex.getPokemonData("Squirtle");
+            } else if (this.selectedPokemon.getName().equals("Charmander")) {
+                enemyPokemon = Pokedex.getPokemonData("Bulbasaur");
+            } else {
+                enemyPokemon = Pokedex.getPokemonData("Charmender");
             }
-            gamePlayerEntity.getInventory().addPokemon(this.selectedPokemon); 
-            gamePlayerEntity.setActivePokemon(this.selectedPokemon); 
-            gamePlayerEntity.getInventory().addItem(new Potion(20), 5); 
 
-            DataHandler.saveGame(gamePlayerEntity, "map01.txt"); 
+            ActionListener runHandler = new ActionListener() { 
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    showNameInputScreen();
+                }
+            };
+
+            battlePane battle = new battlePane(this.selectedPokemon, enemyPokemon, inventory, runHandler);
+            // GamePanel gamePanel = new GamePanel();  
+            // gamePlayerEntity = gamePanel.player; 
+            // gamePlayerEntity.setPlayerName(this.inputPlayerName); 
+
+            // if (gamePlayerEntity.getInventory().getPokemons() != null) { 
+            //     gamePlayerEntity.getInventory().getPokemons().clear(); 
+            // }
+            // gamePlayerEntity.getInventory().addPokemon(this.selectedPokemon); 
+            // gamePlayerEntity.setActivePokemon(this.selectedPokemon); 
+            // gamePlayerEntity.getInventory().addItem(new Potion(20), 5); 
+
+            // DataHandler.saveGame(gamePlayerEntity, "map01.txt"); 
             
-            frame.add(gamePanel); 
-            frame.pack(); 
+            // frame.add(gamePanel); 
+            // frame.pack(); 
 
-            frame.setContentPane(gamePanel); 
-            frame.setLocationRelativeTo(null); 
-            frame.setVisible(true); 
+            // frame.setContentPane(gamePanel); 
+            // frame.setLocationRelativeTo(null); 
+            // frame.setVisible(true); 
 
-            gamePanel.startGameThread(); 
-            gamePanel.requestFocusInWindow(); 
+            // gamePanel.startGameThread(); 
+            // gamePanel.requestFocusInWindow(); 
 
-            frame.revalidate(); 
-            frame.repaint(); 
+            // frame.revalidate(); 
+            // frame.repaint(); 
         });
 
         mainPanel.add(chatPanel); 

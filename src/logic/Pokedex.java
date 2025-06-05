@@ -1,9 +1,9 @@
 package logic;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Pokedex {
 
@@ -11,22 +11,22 @@ public class Pokedex {
 
     static {
         Pokemon bulbasaur = new Pokemon("Bulbasaur", Type.GRASS, 45, 49, 49);
-        bulbasaur.addMove(new Move("Tackle", Type.NORMAL, 40));
-        bulbasaur.addMove(new Move("Vine Whip", Type.GRASS, 45));
+        bulbasaur.addMove(new Move("Tackle", Type.NORMAL, 20));
+        bulbasaur.addMove(new Move("Vine Whip", Type.GRASS, 25));
         bulbasaur.setImagePathF("/Asset/Pokemon/bulba.png");
         bulbasaur.setImagePathB("/Asset/Pokemon/bulbaBack.png");
         POKEMON_DATA.put("Bulbasaur", bulbasaur);
 
         Pokemon charmander = new Pokemon("Charmander", Type.FIRE, 39, 52, 43);
-        charmander.addMove(new Move("Scratch", Type.NORMAL, 40));
-        charmander.addMove(new Move("Ember", Type.FIRE, 40));
+        charmander.addMove(new Move("Scratch", Type.NORMAL, 20));
+        charmander.addMove(new Move("Ember", Type.FIRE, 20));
         charmander.setImagePathF("/Asset/Pokemon/charmender.png");
         charmander.setImagePathB("/Asset/Pokemon/charmenderBack.png");
         POKEMON_DATA.put("Charmander", charmander);
 
         Pokemon squirtle = new Pokemon("Squirtle", Type.WATER, 44, 48, 65);
-        squirtle.addMove(new Move("Tackle", Type.NORMAL, 40));
-        squirtle.addMove(new Move("Water Gun", Type.WATER, 40));
+        squirtle.addMove(new Move("Tackle", Type.NORMAL, 20));
+        squirtle.addMove(new Move("Water Gun", Type.WATER, 20));
         squirtle.setImagePathF("/Asset/Pokemon/squirtle.png");
         squirtle.setImagePathB("/Asset/Pokemon/squirtleBack.png");
         POKEMON_DATA.put("Squirtle", squirtle);

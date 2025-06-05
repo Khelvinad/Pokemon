@@ -4,8 +4,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,6 +17,7 @@ public class battlePane {
     private Battle battle;
     private Font customFont;
     private JLabel playerPokemonLabel, enemyPokemonLabel;
+    private ActionListener onRunAttemptListener;
 
     private JLabel playerNameLabel;
     private JProgressBar playerHPBar;
@@ -26,10 +27,10 @@ public class battlePane {
     private JProgressBar enemyHPBar;
     private JLabel enemyHPTextLabel;
 
-    private JButton[] moveButtons;
     private JButton[] actionButtons;
     private Pokemon playerPokemon, enemyPokemon;
-    private Inventory playerInventory; 
+    private List<Pokemon> pokemonParty;
+    private Inventory playerInventory;
     private BufferedImage backgroundImage;
     private ChatBox chatBox;
     private JPanel movePanel;
@@ -39,35 +40,39 @@ public class battlePane {
     private int charIndex;
     private int Turn_Delay = 1500;
 
-    public battlePane(Pokemon playerPokemon, Pokemon enemyPokemon, Inventory playerInventory) {
+    public battlePane(Pokemon playerPokemon, Pokemon enemyPokemon, Inventory playerInventory, ActionListener runListener) {
         this.playerPokemon = playerPokemon;
         this.enemyPokemon = enemyPokemon;
         this.playerInventory = playerInventory;
+        this.pokemonParty = playerInventory.getPokemons();
+        this.onRunAttemptListener = runListener;
 
-        panel = createBackgroundPanel("src/Asset/battleBG.png");
+        panel = createBackgroundPanel("/Asset/battleBG.png");
         panel.setPreferredSize(new Dimension(1080, 607));
         panel.setLayout(null);
 
-        battle = new Battle(playerPokemon, enemyPokemon);
-        loadCustomFont("src/Asset/Pixellari.ttf");
+        battle = new Battle(this.playerPokemon, this.enemyPokemon);
+        loadCustomFont("/Asset/Pixellari.ttf");
 
         initBattleUI();
         startTypingEffect("Your TURN!!");
     }
-    
+
     private void startTypingEffect(String fullText) {
         if (typingTimer != null && typingTimer.isRunning()) {
             typingTimer.stop();
         }
-        chatBox.getTextArea().setText("");
+        if (chatBox != null && chatBox.getTextArea() != null) {
+            chatBox.getTextArea().setText("");
+        }
         charIndex = 0;
-        int delay = 5;
+        int delay = 25;
 
         typingTimer = new Timer(delay, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (charIndex < fullText.length()) {
-                    chatBox.getTextArea().setText(chatBox.getTextArea().getText() + fullText.charAt(charIndex));
+                if (chatBox != null && chatBox.getTextArea() != null && charIndex < fullText.length()) {
+                    chatBox.getTextArea().append(String.valueOf(fullText.charAt(charIndex)));
                     charIndex++;
                 } else {
                     ((Timer) e.getSource()).stop();
@@ -138,8 +143,10 @@ public class battlePane {
         chatPanel.setOpaque(false);
         chatPanel.setPreferredSize(new Dimension(880, 180));
 
-        chatBox = ChatBox.createChatBox("src/Asset/textBox.png", "", 20, 880, 175, 30, 30);
-        chatPanel.add(chatBox.getLabel(), BorderLayout.WEST);
+        chatBox = ChatBox.createChatBox("/Asset/textBox.png", "", 20, 880, 175, 30, 30);
+        if (chatBox != null && chatBox.getLabel() != null) {
+            chatPanel.add(chatBox.getLabel(), BorderLayout.WEST);
+        }
         bottomPanel.add(chatPanel, BorderLayout.WEST);
 
         movePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -155,7 +162,6 @@ public class battlePane {
         actionButtons = new JButton[4];
         String[] buttonNames = {"Battle", "Pokemon", "Bag", "Run"};
 
-        //Battel Button
         actionButtons[0] = new JButton(buttonNames[0]);
         actionButtons[0].setFont(customFont.deriveFont(18f));
         actionButtons[0].setPreferredSize(new Dimension(150, 40));
@@ -165,17 +171,17 @@ public class battlePane {
             }
         });
         actionButtonsPanel.add(actionButtons[0]);
-        
-        //Pokemon Button
+
         actionButtons[1] = new JButton(buttonNames[1]);
         actionButtons[1].setFont(customFont.deriveFont(16f));
         actionButtons[1].setPreferredSize(new Dimension(150, 40));
         actionButtons[1].addActionListener(e -> {
-            startTypingEffect("Selected " + buttonNames[1] + ". POKETHOL KONTOL");
+            if (!battle.isBattleOver()) {
+                showPokemonSwitchScreen();
+            }
         });
         actionButtonsPanel.add(actionButtons[1]);
 
-        //Bag Button
         actionButtons[2] = new JButton(buttonNames[2]);
         actionButtons[2].setFont(customFont.deriveFont(16f));
         actionButtons[2].setPreferredSize(new Dimension(150, 40));
@@ -185,13 +191,18 @@ public class battlePane {
             }
         });
         actionButtonsPanel.add(actionButtons[2]);
-        
-        //Run Button
+
         actionButtons[3] = new JButton(buttonNames[3]);
         actionButtons[3].setFont(customFont.deriveFont(16f));
         actionButtons[3].setPreferredSize(new Dimension(150, 40));
         actionButtons[3].addActionListener(e -> {
-            System.exit(0);
+            System.out.println("Attempting to run...");
+            if (onRunAttemptListener != null) {
+                setBattleActionsEnabled(false);
+                onRunAttemptListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "runAttempted"));
+            } else {
+                startTypingEffect("You can't run from this battle!");
+            }
         });
         actionButtonsPanel.add(actionButtons[3]);
 
@@ -201,48 +212,52 @@ public class battlePane {
 
     private void setBattleActionsEnabled(boolean enabled) {
         for (JButton btn : actionButtons) {
-            btn.setEnabled(enabled);
+            if (btn != null) btn.setEnabled(enabled);
         }
         if (!enabled && movePanel.getComponentCount() > 0) {
-        for(Component comp : movePanel.getComponents()){
-            if(comp instanceof JButton){
-                ((JButton) comp).setEnabled(false);
+            for(Component comp : movePanel.getComponents()){
+                if(comp instanceof JButton){
+                    ((JButton) comp).setEnabled(false);
+                }
             }
         }
-    }
     }
 
     private void showMoveButtons() {
         movePanel.removeAll();
-        movePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0)); 
-        moveButtons = new JButton[playerPokemon.getMoves().size()];
+        movePanel.setLayout(new GridLayout(2, 2, 5, 5));
         logText.setLength(0);
         startTypingEffect("Choose a move for " + playerPokemon.getName() + "!");
 
-        for (int i = 0; i < playerPokemon.getMoves().size(); i++) {
-            Move move = playerPokemon.getMoves().get(i);
+        List<Move> moves = playerPokemon.getMoves();
+        int movesToShow = Math.min(moves.size(), 4);
+
+        for (int i = 0; i < movesToShow; i++) {
+            Move move = moves.get(i);
             JButton moveButton = new JButton(move.getName());
             moveButton.setFont(customFont.deriveFont(12f));
-            moveButton.setPreferredSize(new Dimension(100, 40));
-            
+
             moveButton.addActionListener(e -> {
                 if (battle.isBattleOver()) return;
 
+                setBattleActionsEnabled(true);
+                resetSubActionPanel();
+
                 String playerAttackLog = battle.executePlayerTurn(move);
+                logText.setLength(0);
                 logText.append(playerAttackLog).append("\n");
                 updateHP();
+                startTypingEffect(logText.toString());
 
                 if (battle.isBattleOver()) {
                     logText.append(battle.getBattleResult()).append("\n");
                     startTypingEffect(logText.toString());
-                    hideMoveButtons();
                     setBattleActionsEnabled(false);
                     return;
                 }
-                
-                hideMoveButtons();
-                setBattleActionsEnabled(false);
+
                 Timer delayTimer = new Timer(Turn_Delay, (actionEvent) -> {
+                    logText.setLength(0);
                     String enemyAttackLog = battle.executeEnemyTurn();
                     logText.append(enemyAttackLog).append("\n");
                     updateHP();
@@ -255,7 +270,6 @@ public class battlePane {
                         setBattleActionsEnabled(true);
                     }
                     startTypingEffect(logText.toString());
-
                 });
                 delayTimer.setRepeats(false);
                 delayTimer.start();
@@ -263,54 +277,47 @@ public class battlePane {
             movePanel.add(moveButton);
         }
 
+        if (movesToShow > 0 && movePanel.getComponentCount() < 4 || movesToShow == 0) {
+            JButton backFromMovesButton = new JButton("Back");
+            backFromMovesButton.setFont(customFont.deriveFont(12f));
+            backFromMovesButton.addActionListener(ev -> {
+                resetSubActionPanel();
+                startTypingEffect("Your TURN!!");
+            });
+            movePanel.add(backFromMovesButton);
+        }
+
         chatPanel.setPreferredSize(new Dimension(660, 175));
-        chatBox.resize(660, 175, 30, 30);
+        if (chatBox != null) chatBox.resize(660, 175, 30, 30);
 
-        chatPanel.revalidate();
-        chatPanel.repaint();
-        chatBox.getLabel().revalidate();
-        chatBox.getLabel().repaint();
-
-        panel.revalidate();
-        panel.repaint();
+        refreshDynamicPanels();
     }
 
-    private void hideMoveButtons() {
+    private void resetSubActionPanel() {
         movePanel.removeAll();
+        movePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        chatPanel.setPreferredSize(new Dimension(880, 180));
+        if (chatBox != null) chatBox.resize(880, 175, 30, 30);
 
-        chatPanel.setPreferredSize(new Dimension(880, 175));
-        chatBox.resize(880, 175, 30, 30);
-        
-        movePanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0)); 
-        movePanel.revalidate();
-        movePanel.repaint();
-
-        chatPanel.revalidate();
-        chatPanel.repaint();
-        chatBox.getLabel().revalidate();
-        chatBox.getLabel().repaint();
-
-        panel.revalidate();
-        panel.repaint();
+        refreshDynamicPanels();
     }
-    
+
     private void showBagScreen() {
-        logText.setLength(0);
-        setBattleActionsEnabled(false); 
+        setBattleActionsEnabled(true);
 
         movePanel.removeAll();
-        movePanel.setLayout(new GridLayout(0, 1, 5, 5)); 
+        movePanel.setLayout(new GridLayout(0, 1, 5, 5));
 
         List<String> itemNames = playerInventory.getItemNames();
+        logText.setLength(0);
 
-        if (itemNames.isEmpty()) {
+        if (itemNames.isEmpty() || playerInventory.getItemNames().stream().allMatch(name -> playerInventory.getItemQuantity(name) == 0)) {
             startTypingEffect("Your bag is empty.");
             JButton backButtonEmpty = new JButton("Back");
             backButtonEmpty.setFont(customFont.deriveFont(12f));
             backButtonEmpty.setPreferredSize(new Dimension(150,35));
             backButtonEmpty.addActionListener(e -> {
-                hideMoveButtons(); 
-                setBattleActionsEnabled(true);
+                resetSubActionPanel();
                 startTypingEffect("Your TURN!!");
             });
             movePanel.add(backButtonEmpty);
@@ -321,42 +328,25 @@ public class battlePane {
                 if (quantity > 0) {
                     JButton itemButton = new JButton(itemName + " x" + quantity);
                     itemButton.setFont(customFont.deriveFont(12f));
-                    itemButton.setPreferredSize(new Dimension(150, 35)); 
+                    itemButton.setPreferredSize(new Dimension(150, 35));
                     itemButton.addActionListener(e -> {
                         String useResult = playerInventory.useItem(itemName, playerPokemon);
-                        logText.append(useResult).append("\n");
                         updateHP();
-                        startTypingEffect(logText.toString());
+                        startTypingEffect(useResult+"\n");
 
-                        if (useResult.contains("full!") || useResult.contains("not available.") || useResult.contains("does not exist")) {
-                            showBagScreen(); 
-                        } else {
-                            hideMoveButtons();
-                            setBattleActionsEnabled(false);
-
-                            if (battle.isBattleOver()) { 
-                                logText.append(battle.getBattleResult()).append("\n");
-                                startTypingEffect(logText.toString());
-                                return; 
+                        Timer afterItemUseTimer = new Timer(1200, event -> {
+                            if (battle.isBattleOver()) {
+                                String finalMessage = useResult + "\n" + battle.getBattleResult() + "\n";
+                                startTypingEffect(finalMessage);
+                                setBattleActionsEnabled(false);
+                                resetSubActionPanel();
+                            } else {
+                                resetSubActionPanel();
+                                startTypingEffect("Your TURN!!");
                             }
-
-                            Timer enemyTurnTimer = new Timer(Turn_Delay, ae -> {
-                                String enemyAttackLog = battle.executeEnemyTurn();
-                                logText.append(enemyAttackLog).append("\n");
-                                updateHP();
-
-                                if (battle.isBattleOver()) {
-                                    logText.append(battle.getBattleResult()).append("\n");
-                                } else {
-                                    logText.append("Your TURN!!").append("\n");
-                                    setBattleActionsEnabled(true); 
-                                }
-                                startTypingEffect(logText.toString()); 
-                            });
-                            enemyTurnTimer.setRepeats(false);
-                            enemyTurnTimer.start();
-                            setBattleActionsEnabled(true);
-                        }
+                        });
+                        afterItemUseTimer.setRepeats(false);
+                        afterItemUseTimer.start();
                     });
                     movePanel.add(itemButton);
                 }
@@ -365,40 +355,37 @@ public class battlePane {
             backButton.setFont(customFont.deriveFont(12f));
             backButton.setPreferredSize(new Dimension(150,35));
             backButton.addActionListener(e -> {
-                hideMoveButtons(); 
-                setBattleActionsEnabled(true);
+                resetSubActionPanel();
                 startTypingEffect("Your TURN!!");
             });
             movePanel.add(backButton);
         }
 
-        chatPanel.setPreferredSize(new Dimension(660, 175)); 
-        chatBox.resize(660, 175, 30, 30);
+        chatPanel.setPreferredSize(new Dimension(660, 175));
+        if (chatBox != null) chatBox.resize(660, 175, 30, 30);
 
-        movePanel.revalidate();
-        movePanel.repaint();
-        chatPanel.revalidate();
-        chatPanel.repaint();
-        panel.revalidate();
-        panel.repaint();
+        refreshDynamicPanels();
     }
 
     private void updateHP() {
-        playerNameLabel.setText(playerPokemon.getName());
-        playerHPBar.setMaximum(playerPokemon.getMaxHealth());
-        playerHPBar.setValue(playerPokemon.getHealth());
-        playerHPTextLabel.setText(playerPokemon.getHealth() + "/" + playerPokemon.getMaxHealth());
-        setHPBarColor(playerHPBar, playerPokemon.getHealth(), playerPokemon.getMaxHealth());
-
-        enemyNameLabel.setText(enemyPokemon.getName());
-        enemyHPBar.setMaximum(enemyPokemon.getMaxHealth());
-        enemyHPBar.setValue(enemyPokemon.getHealth());
-        enemyHPTextLabel.setText(enemyPokemon.getHealth() + "/" + enemyPokemon.getMaxHealth());
-        setHPBarColor(enemyHPBar, enemyPokemon.getHealth(), enemyPokemon.getMaxHealth());
+        if (playerPokemon != null) {
+            playerNameLabel.setText(playerPokemon.getName());
+            playerHPBar.setMaximum(playerPokemon.getMaxHealth());
+            playerHPBar.setValue(playerPokemon.getHealth());
+            playerHPTextLabel.setText(playerPokemon.getHealth() + "/" + playerPokemon.getMaxHealth());
+            setHPBarColor(playerHPBar, playerPokemon.getHealth(), playerPokemon.getMaxHealth());
+        }
+        if (enemyPokemon != null) {
+            enemyNameLabel.setText(enemyPokemon.getName());
+            enemyHPBar.setMaximum(enemyPokemon.getMaxHealth());
+            enemyHPBar.setValue(enemyPokemon.getHealth());
+            enemyHPTextLabel.setText(enemyPokemon.getHealth() + "/" + enemyPokemon.getMaxHealth());
+            setHPBarColor(enemyHPBar, enemyPokemon.getHealth(), enemyPokemon.getMaxHealth());
+        }
     }
 
     private void setHPBarColor(JProgressBar hpBar, int currentHP, int maxHP) {
-        double percentage = (double) currentHP / maxHP;
+        double percentage = (maxHP == 0) ? 0 : (double) currentHP / maxHP;
         if (percentage > 0.5) {
             hpBar.setForeground(new Color(0, 200, 0));
         } else if (percentage > 0.2) {
@@ -413,23 +400,55 @@ public class battlePane {
     }
 
     private ImageIcon loadPokemon(String path, int scale) {
+        if (path == null || path.trim().isEmpty()) {
+            System.out.println("Error loading image: path is null or empty for loadPokemon.");
+            return createPlaceholderIcon(scale);
+        }
         try {
-            ImageIcon rawIcon = new ImageIcon(getClass().getResource(path));
-            Image scaledImage = rawIcon.getImage().getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
+            InputStream imgStream = getClass().getResourceAsStream(path);
+            if (imgStream == null) {
+                System.out.println("Error loading image from classpath: " + path + " (Stream is null)");
+                return createPlaceholderIcon(scale);
+            }
+            BufferedImage bufferedImage = ImageIO.read(imgStream);
+            if (bufferedImage == null) {
+                System.out.println("Error loading image: ImageIO.read returned null for " + path);
+                return createPlaceholderIcon(scale);
+            }
+            Image scaledImage = bufferedImage.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         } catch (Exception e) {
-            System.out.println("Error loading image: " + path);
-            return null;
+            System.out.println("Exception in loadPokemon for path: " + path);
+            e.printStackTrace();
+            return createPlaceholderIcon(scale);
         }
+    }
+
+    private ImageIcon createPlaceholderIcon(int size) {
+        BufferedImage placeholder = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = placeholder.createGraphics();
+        g2d.setColor(Color.LIGHT_GRAY);
+        g2d.fillRect(0, 0, size, size);
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.drawString("?", size/2 - 5, size/2 + 5);
+        g2d.drawRect(0,0,size-1,size-1);
+        g2d.dispose();
+        return new ImageIcon(placeholder);
     }
 
     private void loadCustomFont(String fontPath) {
         try {
-            File fontFile = new File(fontPath);
-            customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+            InputStream is = getClass().getResourceAsStream(fontPath);
+            if (is == null) {
+                System.err.println("Font not found in classpath: " + fontPath);
+                customFont = new Font("Arial", Font.PLAIN, 18);
+                return;
+            }
+            customFont = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(customFont);
         } catch (Exception e) {
+            System.err.println("Failed to load custom font: " + fontPath);
             e.printStackTrace();
             customFont = new Font("Arial", Font.PLAIN, 18);
         }
@@ -441,13 +460,98 @@ public class battlePane {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 try {
-                    backgroundImage = ImageIO.read(new File(imagePath));
+                    InputStream imgStream = getClass().getResourceAsStream(imagePath);
+                    if (imgStream == null) {
+                        System.err.println("Background image not found in classpath: " + imagePath);
+                        g.setColor(Color.DARK_GRAY);
+                        g.fillRect(0, 0, getWidth(), getHeight());
+                        return;
+                    }
+                    backgroundImage = ImageIO.read(imgStream);
                     g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
                 } catch (IOException e) {
-                    g.setColor(Color.RED);
+                    System.err.println("Failed to load background image: " + imagePath);
+                    g.setColor(Color.BLACK);
                     g.fillRect(0, 0, getWidth(), getHeight());
                 }
             }
         };
+    }
+
+    private void showPokemonSwitchScreen() {
+        setBattleActionsEnabled(false);
+
+        movePanel.removeAll();
+        movePanel.setLayout(new GridLayout(2, 2, 5, 5));
+
+        logText.setLength(0);
+        int pokemonButtonsAdded = 0;
+        final int MAX_POKEMON_BUTTONS_TO_SHOW = 3;
+
+        for (Pokemon pokemonInParty : pokemonParty) {
+            if (pokemonButtonsAdded >= MAX_POKEMON_BUTTONS_TO_SHOW) {
+                break;
+            }
+            if (pokemonInParty != this.playerPokemon && pokemonInParty.getHealth() > 0) {
+                JButton pokemonButton = new JButton(
+                    "<html><center>" + pokemonInParty.getName() +
+                    "<br>(HP: " + pokemonInParty.getHealth() + "/" + pokemonInParty.getMaxHealth() +
+                    ")</center></html>"
+                );
+                pokemonButton.setFont(customFont.deriveFont(11f));
+
+                pokemonButton.addActionListener(e -> {
+                    Pokemon oldPokemon = this.playerPokemon;
+                    this.playerPokemon = pokemonInParty;
+                    battle.setPlayerPokemon(this.playerPokemon);
+
+                    playerPokemonLabel.setIcon(loadPokemon(this.playerPokemon.getImagePathB(), 270));
+                    updateHP();
+
+                    logText.setLength(0);
+                    logText.append(oldPokemon.getName()).append(" return! Go, ").append(this.playerPokemon.getName()).append("!\n");
+                    startTypingEffect(logText.toString());
+                    resetSubActionPanel();
+                });
+                movePanel.add(pokemonButton);
+                pokemonButtonsAdded++;
+            }
+        }
+
+        if (pokemonButtonsAdded == 0 && pokemonParty.size() > 1) {
+            startTypingEffect("No other Pokemon available to switch!");
+        } else if (pokemonParty.size() <=1) {
+            resetSubActionPanel();
+            startTypingEffect("You have no other Pokemon to switch to!");
+        } else if (pokemonButtonsAdded > 0) {
+            startTypingEffect("Choose a Pokemon to switch to.");
+        }
+
+
+        JButton backButton = new JButton("Back");
+        backButton.setFont(customFont.deriveFont(12f));
+        backButton.addActionListener(e -> {
+            resetSubActionPanel();
+            startTypingEffect("Your TURN!!");
+        });
+        movePanel.add(backButton);
+
+        chatPanel.setPreferredSize(new Dimension(660, 175));
+        if (chatBox != null) chatBox.resize(660, 175, 30, 30);
+
+        refreshDynamicPanels();
+    }
+
+    private void refreshDynamicPanels(){
+        movePanel.revalidate();
+        movePanel.repaint();
+        chatPanel.revalidate();
+        chatPanel.repaint();
+        if (chatBox != null && chatBox.getLabel() != null) {
+            chatBox.getLabel().revalidate();
+            chatBox.getLabel().repaint();
+        }
+        panel.revalidate();
+        panel.repaint();
     }
 }

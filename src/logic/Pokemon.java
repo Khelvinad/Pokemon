@@ -77,9 +77,9 @@ public class Pokemon {
     }
 
     public String attack(Pokemon target, Move move) {
-        int damage = Battle.calculateDamage(this, move, target); //
+        int damage = Battle.calculateDamage(this, move, target); 
         String attackMessage = this.name + " used " + move.getName() + " on " + target.getName() + " for " + damage + " damage!";
-        String faintMessage = target.takeDamage(damage); //
+        String faintMessage = target.takeDamage(damage); 
         return attackMessage + (faintMessage.isEmpty() ? "" : "\n" + faintMessage);
     }
 

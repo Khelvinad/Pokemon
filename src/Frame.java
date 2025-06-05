@@ -81,8 +81,8 @@ public class Frame {
         startButton.setMaximumSize(buttonSize);
         startButton.setMinimumSize(buttonSize);
         startButton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(143, 248, 226), 4),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            BorderFactory.createLineBorder(Color.BLACK, 2),
+            BorderFactory.createLineBorder(new Color(202, 85, 56).brighter().brighter(), 2) 
         ));
 
         JButton loadButton = new JButton("Load");
@@ -94,20 +94,20 @@ public class Frame {
         loadButton.setMaximumSize(buttonSize);
         loadButton.setMinimumSize(buttonSize);
         loadButton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(249, 224, 144), 4),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            BorderFactory.createLineBorder(Color.BLACK, 2),
+            BorderFactory.createLineBorder(new Color(202, 85, 56).brighter().brighter(), 2) 
         ));
 
         JButton exitButton = new JButton("Exit");
         exitButton.setFont(customFont.deriveFont(Font.BOLD, 18f));
-        exitButton.setBackground(new Color(233, 247, 255));
+        exitButton.setBackground(new Color(223, 144, 124));
         exitButton.setForeground(Color.BLACK);
         exitButton.setPreferredSize(new Dimension(200, 30));
         exitButton.setMaximumSize(buttonSize);
         exitButton.setMinimumSize(buttonSize);
         exitButton.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(255, 73, 73), 4),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+            BorderFactory.createLineBorder(Color.BLACK, 2),
+            BorderFactory.createLineBorder(new Color(233, 51, 5).darker(), 2) 
         ));
 
         centerPan.add(Box.createRigidArea(new Dimension(0, 240)));

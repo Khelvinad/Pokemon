@@ -76,7 +76,7 @@ public class Inventory {
             return "Item " + itemName + " not found in inventory.";
         }
         if (getItemQuantity(itemName) <= 0) {
-             return itemName + " not available (quantity is 0).";
+            return itemName + " not available (quantity is 0).";
         }
 
         if (item instanceof Potion) {
