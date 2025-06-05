@@ -271,9 +271,9 @@ class StartButtonAction extends MenuButtonAction {
                 
                 DataHandler.saveGame(gamePanel.player, "map01.txt"); 
 
-                frame.add(gamePanel, BorderLayout.CENTER);
-                frame.pack(); 
-                frame.setContentPane(gamePanel); 
+                frame.getContentPane().removeAll(); 
+                frame.setContentPane(gamePanel);
+                frame.pack();
                 frame.setLocationRelativeTo(null); 
                 frame.setVisible(true);
 
@@ -285,8 +285,7 @@ class StartButtonAction extends MenuButtonAction {
             };
 
             ActionListener runAttemptHandlerForInitialBattle = runEvent -> {
-                System.out.println("Run attempted from initial battle. Returning to name input screen.");
-                showNameInputScreen(); 
+                System.out.println("You cant run kids.");
             };
 
             battlePane battleScreen = new battlePane(
